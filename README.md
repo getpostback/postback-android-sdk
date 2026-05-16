@@ -10,7 +10,7 @@ Add to your app's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("app.appsprint:sdk:1.0.2")
+    implementation("app.appsprint:sdk:1.1.0")
 }
 ```
 
@@ -22,7 +22,7 @@ repositories {
 }
 ```
 
-The SDK already declares `INTERNET` and `com.google.android.gms.permission.AD_ID`, so you do not need to add them to your manifest.
+The SDK already declares `INTERNET`, `ACCESS_NETWORK_STATE`, and `com.google.android.gms.permission.AD_ID`, so you do not need to add them to your manifest.
 
 ### Manual AAR
 
