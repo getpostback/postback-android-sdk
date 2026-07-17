@@ -54,22 +54,12 @@ jobs:
             git push origin "${VERSION}"
           fi
 
-      - name: Download and re-upload AAR
+      - name: Verify public AAR release
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          gh release download "v${VERSION}" \
-            --repo getpostback/postback-android \
-            --pattern sdk-release.aar
-          unzip -t sdk-release.aar >/dev/null
-          mv sdk-release.aar postback-sdk.aar
-          if gh release view "${VERSION}" >/dev/null 2>&1; then
-            gh release upload "${VERSION}" postback-sdk.aar --clobber
-          else
-            gh release create "${VERSION}" \
-              postback-sdk.aar \
-              --title "Postback Android SDK ${VERSION}" \
-              --notes "Obfuscated AAR for Postback Android SDK ${VERSION}"
-          fi
+          gh release download "${VERSION}" --pattern postback-sdk.aar
+          unzip -t postback-sdk.aar >/dev/null
+          test "$(wc -c < postback-sdk.aar)" -gt 70000
           rm postback-sdk.aar
         env:
-          GH_TOKEN: ${{ secrets.DIST_REPO_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
