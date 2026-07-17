@@ -37,7 +37,7 @@ jobs:
       - name: Update README version
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          sed -i "s/implementation(\"app.appsprint:sdk:.*\")/implementation(\"app.appsprint:sdk:${VERSION}\")/" README.md
+          sed -i "s/implementation(\"sh.postback:sdk:.*\")/implementation(\"sh.postback:sdk:${VERSION}\")/" README.md
 
       - name: Commit and tag
         run: |
@@ -52,11 +52,11 @@ jobs:
       - name: Download and re-upload AAR
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          curl -L -o appsprint-sdk.aar "${{ steps.version.outputs.url }}"
+          curl -L -o postback-sdk.aar "${{ steps.version.outputs.url }}"
           gh release create "${VERSION}" \
-            appsprint-sdk.aar \
-            --title "AppSprint Android SDK ${VERSION}" \
-            --notes "Obfuscated AAR for AppSprint Android SDK ${VERSION}"
-          rm appsprint-sdk.aar
+            postback-sdk.aar \
+            --title "Postback Android SDK ${VERSION}" \
+            --notes "Obfuscated AAR for Postback Android SDK ${VERSION}"
+          rm postback-sdk.aar
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

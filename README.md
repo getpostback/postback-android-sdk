@@ -1,4 +1,4 @@
-# AppSprint Android SDK
+# Postback Android SDK
 
 Lightweight mobile attribution SDK for Android. Tracks installs, events, and campaign attribution with offline support.
 
@@ -10,7 +10,7 @@ Add to your app's `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("app.appsprint:sdk:1.1.2")
+    implementation("sh.postback:sdk:1.0.0")
 }
 ```
 
@@ -26,31 +26,33 @@ The SDK already declares `INTERNET`, `ACCESS_NETWORK_STATE`, and `com.google.and
 
 ### Manual AAR
 
-Download the AAR from [Releases](https://github.com/getappsprint/appsprint-android-sdk/releases) and add to your project's `libs/` directory:
+Download the AAR from [Releases](https://github.com/getpostback/postback-android-sdk/releases) and add to your project's `libs/` directory:
 
 ```kotlin
 dependencies {
-    implementation(files("libs/appsprint-sdk.aar"))
-    implementation("androidx.lifecycle:lifecycle-process:2.8.7")
+    implementation(files("libs/postback-sdk.aar"))
+    implementation("androidx.lifecycle:lifecycle-process:2.10.0")
+    implementation("com.google.android.gms:play-services-ads-identifier:18.3.0")
+    implementation("com.android.installreferrer:installreferrer:2.2")
 }
 ```
 
 ## Quick Start
 
 ```kotlin
-import com.appsprint.sdk.AppSprint
-import com.appsprint.sdk.AppSprintConfig
-import com.appsprint.sdk.AppSprintEventType
+import sh.postback.sdk.Postback
+import sh.postback.sdk.PostbackConfig
+import sh.postback.sdk.PostbackEventType
 
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val sdk = AppSprint.shared(applicationContext)
-        sdk.configure(AppSprintConfig(apiKey = "as_live_your_api_key"))
+        val sdk = Postback.shared(applicationContext)
+        sdk.configure(PostbackConfig(apiKey = "pb_live_your_api_key"))
 
         sdk.sendEvent(
-            AppSprintEventType.PURCHASE,
+            PostbackEventType.PURCHASE,
             name = "premium_upgrade",
             params = mapOf("revenue" to 9.99, "currency" to "USD")
         )
@@ -64,10 +66,9 @@ class MyApplication : Application() {
 ## Configuration
 
 ```kotlin
-val config = AppSprintConfig(
-    apiKey = "as_live_...",                  // Required
-    apiUrl = "https://api.appsprint.app",    // Default
-    enableAppleAdsAttribution = false,       // iOS-only, ignored on Android
+val config = PostbackConfig(
+    apiKey = "pb_live_...",                  // Required
+    apiUrl = "https://api.postback.sh",    // Default
     customerUserId = null,                   // Optional: your internal user ID
     autoTrackSessions = true,                // Default: fires session_start on
                                              // configure() and foreground,
@@ -82,25 +83,23 @@ val config = AppSprintConfig(
 ## API Reference
 
 ```kotlin
-val sdk = AppSprint.shared(context)
+val sdk = Postback.shared(context)
 
 // Lifecycle
-sdk.configure(config: AppSprintConfig)
+sdk.configure(config: PostbackConfig)
 sdk.destroy()
 sdk.isInitialized(): Boolean
 
 // Events
-sdk.sendEvent(type: AppSprintEventType, name: String?, params: Map?)
+sdk.sendEvent(type: PostbackEventType, name: String?, params: Map?)
 sdk.sendTestEvent(): TestEventResult
 sdk.flush()
 
 // Attribution
 sdk.getAttribution(): AttributionResult?
 sdk.getAttributionParams(): Map<String, String>
-sdk.getAppSprintId(): String?
+sdk.getPostbackId(): String?
 sdk.refreshAttribution(): AttributionResult?
-sdk.enableAppleAdsAttribution(): Boolean    // returns false on Android
-
 // User
 sdk.setCustomerUserId(userId: String)
 
@@ -138,7 +137,7 @@ Don't pass raw user PII (email, phone, full name) through `params` or `customerU
 
 ## Requirements
 
-- Android API 21+ (Android 5.0)
+- Android API 24+ (Android 7.0)
 - Kotlin 1.9+ or Java 17
 
 ## License
