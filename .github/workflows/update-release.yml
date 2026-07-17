@@ -46,17 +46,30 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
           git diff --cached --quiet && echo "No changes" || git commit -m "Release ${VERSION}"
-          git tag "${VERSION}"
-          git push origin main --tags
+          git push origin main
+          if git ls-remote --exit-code --tags origin "refs/tags/${VERSION}" >/dev/null 2>&1; then
+            echo "Tag ${VERSION} already exists"
+          else
+            git tag "${VERSION}"
+            git push origin "${VERSION}"
+          fi
 
       - name: Download and re-upload AAR
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          curl -L -o postback-sdk.aar "${{ steps.version.outputs.url }}"
-          gh release create "${VERSION}" \
-            postback-sdk.aar \
-            --title "Postback Android SDK ${VERSION}" \
-            --notes "Obfuscated AAR for Postback Android SDK ${VERSION}"
+          gh release download "v${VERSION}" \
+            --repo getpostback/postback-android \
+            --pattern sdk-release.aar
+          unzip -t sdk-release.aar >/dev/null
+          mv sdk-release.aar postback-sdk.aar
+          if gh release view "${VERSION}" >/dev/null 2>&1; then
+            gh release upload "${VERSION}" postback-sdk.aar --clobber
+          else
+            gh release create "${VERSION}" \
+              postback-sdk.aar \
+              --title "Postback Android SDK ${VERSION}" \
+              --notes "Obfuscated AAR for Postback Android SDK ${VERSION}"
+          fi
           rm postback-sdk.aar
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.DIST_REPO_TOKEN }}
